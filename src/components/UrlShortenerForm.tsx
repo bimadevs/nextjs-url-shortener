@@ -5,8 +5,10 @@ import { nanoid } from 'nanoid';
 import { toast } from 'react-hot-toast';
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 import { FiClock } from 'react-icons/fi';
+import { useRouter } from 'next/navigation';
 
 export default function UrlShortenerForm() {
+  const router = useRouter();
   const supabase = createClientComponentClient();
   const [loading, setLoading] = useState(false);
   const [useCustomCode, setUseCustomCode] = useState(false);
@@ -107,6 +109,15 @@ export default function UrlShortenerForm() {
       
       setFormData({ original_url: '', custom_code: '', title: '' });
       setUseCustomCode(false);
+
+      // Refresh halaman setelah berhasil menambahkan URL
+      router.refresh();
+      
+      // Tunggu sebentar lalu reload halaman
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
     } catch (error: any) {
       toast.error(error.message || 'Terjadi kesalahan. Silakan coba lagi', {
         duration: 4000,
