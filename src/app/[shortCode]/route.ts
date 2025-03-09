@@ -1,13 +1,13 @@
 import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
-  request: Request,
-  { params }: { params: { shortCode: string } }
+  request: NextRequest,
+  context: { params: { shortCode: string } }
 ) {
   try {
-    const { shortCode } = params;
+    const { shortCode } = context.params;
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
@@ -20,7 +20,12 @@ export async function GET(
 
     if (fetchError || !urlData) {
       console.error('Error fetching URL:', fetchError);
-      return new NextResponse('URL tidak ditemukan', { status: 404 });
+      return new NextResponse('URL tidak ditemukan', { 
+        status: 404,
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+      });
     }
 
     // Update jumlah klik
@@ -34,9 +39,14 @@ export async function GET(
     }
 
     // Redirect ke URL asli
-    return NextResponse.redirect(urlData.original_url);
+    return NextResponse.redirect(urlData.original_url, { status: 302 });
   } catch (error) {
     console.error('Error in redirect handler:', error);
-    return new NextResponse('Terjadi kesalahan', { status: 500 });
+    return new NextResponse('Terjadi kesalahan', { 
+      status: 500,
+      headers: {
+        'Content-Type': 'text/plain',
+      },
+    });
   }
 } 
