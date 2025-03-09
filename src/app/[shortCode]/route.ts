@@ -6,10 +6,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(
-  request: NextRequest,
-  context: { params: { shortCode: string } }
+  request: NextRequest, context: any
 ) {
   try {
+    const shortCode = context.params.shortCode;
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
@@ -17,7 +17,7 @@ export async function GET(
     const { data: urlData, error: fetchError } = await supabase
       .from('short_urls')
       .select('id, original_url, clicks')
-      .eq('short_code', context.params.shortCode)
+      .eq('short_code', shortCode)
       .single();
 
     if (fetchError || !urlData) {
