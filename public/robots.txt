@@ -1,0 +1,10 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://url.bimadev.xyz/sitemap.xml
+
+# Disallow admin and auth pages
+Disallow: /dashboard
+Disallow: /auth/* 
