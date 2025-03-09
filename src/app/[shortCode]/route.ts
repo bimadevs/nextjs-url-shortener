@@ -2,12 +2,20 @@ import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
+interface RouteContext {
+  params: {
+    shortCode: string;
+  };
+}
+
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET(
-  request: NextRequest,
-  context: { params: { shortCode: string } }
-) {
+  _req: NextRequest,
+  { params }: RouteContext
+): Promise<NextResponse> {
   try {
-    const { shortCode } = context.params;
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
@@ -15,7 +23,7 @@ export async function GET(
     const { data: urlData, error: fetchError } = await supabase
       .from('short_urls')
       .select('id, original_url, clicks')
-      .eq('short_code', shortCode)
+      .eq('short_code', params.shortCode)
       .single();
 
     if (fetchError || !urlData) {
