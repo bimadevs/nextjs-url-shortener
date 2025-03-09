@@ -107,6 +107,19 @@ begin
   where expiration_date < now();
 end;
 $$;
+
+-- Function untuk increment clicks secara atomic
+create or replace function increment_clicks(url_id uuid)
+returns void
+language plpgsql
+security definer
+as $$
+begin
+  update short_urls
+  set clicks = clicks + 1
+  where id = url_id;
+end;
+$$;
 ```
 
 5. Jalankan development server
