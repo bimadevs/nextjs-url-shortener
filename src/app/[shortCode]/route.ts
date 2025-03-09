@@ -5,12 +5,13 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-// Definisikan tipe untuk parameter kedua
-type Context = { params: { shortCode: string } };
-
-export async function GET(request: NextRequest, context: Context) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: { shortCode: string } }
+) {
   try {
-    const params = context.params; // Akses params dari context
+    const { shortCode } = params; // Ambil shortCode langsung dari params
+
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
@@ -18,7 +19,7 @@ export async function GET(request: NextRequest, context: Context) {
     const { data: urlData, error: fetchError } = await supabase
       .from('short_urls')
       .select('id, original_url, clicks')
-      .eq('short_code', params.shortCode)
+      .eq('short_code', shortCode)
       .single();
 
     if (fetchError || !urlData) {
