@@ -6,10 +6,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(
-  request: NextRequest, { params }: { params: { shortCode: string } }
+  request: NextRequest, context: any
 ) {
   try {
-    const shortCode = params.shortCode;
+    const shortCode = context.params.shortCode;
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
