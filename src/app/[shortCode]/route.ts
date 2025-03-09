@@ -5,11 +5,12 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { shortCode: string } }
-) {
+// Definisikan tipe untuk parameter kedua
+type Context = { params: { shortCode: string } };
+
+export async function GET(request: NextRequest, context: Context) {
   try {
+    const params = context.params; // Akses params dari context
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
@@ -51,4 +52,4 @@ export async function GET(
       },
     });
   }
-} 
+}
