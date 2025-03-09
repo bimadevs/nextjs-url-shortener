@@ -39,18 +39,45 @@ export default function UrlList({ userId }: UrlListProps) {
 
       // Subscribe to changes
       const channel = supabase
-        .channel('table_db_changes')
+        .channel('url_changes')
         .on(
           'postgres_changes',
           {
-            event: '*',
+            event: 'INSERT',
             schema: 'public',
             table: 'short_urls',
             filter: `user_id=eq.${userId}`,
           },
           (payload) => {
-            console.log('Change received!', payload);
-            fetchUrls();
+            setUrls(currentUrls => [payload.new as ShortUrl, ...currentUrls]);
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'DELETE',
+            schema: 'public',
+            table: 'short_urls',
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            setUrls(currentUrls => currentUrls.filter(url => url.id !== payload.old.id));
+          }
+        )
+        .on(
+          'postgres_changes',
+          {
+            event: 'UPDATE',
+            schema: 'public',
+            table: 'short_urls',
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            setUrls(currentUrls => 
+              currentUrls.map(url => 
+                url.id === payload.new.id ? { ...url, ...payload.new } : url
+              )
+            );
           }
         )
         .subscribe();
@@ -73,7 +100,7 @@ export default function UrlList({ userId }: UrlListProps) {
 
   const handleDelete = async (id: string) => {
     try {
-      setDeletingId(id); // Set ID yang sedang dihapus
+      setDeletingId(id);
 
       const { error } = await supabase
         .from('short_urls')
@@ -82,13 +109,13 @@ export default function UrlList({ userId }: UrlListProps) {
 
       if (error) throw error;
 
-      // Update state urls secara lokal
-      setUrls(prevUrls => prevUrls.filter(url => url.id !== id));
       toast.success('URL berhasil dihapus!');
     } catch (error: any) {
       toast.error('Gagal menghapus URL');
+      // Jika gagal, kembalikan URL ke daftar
+      await fetchUrls();
     } finally {
-      setDeletingId(null); // Reset ID yang sedang dihapus
+      setDeletingId(null);
     }
   };
 
