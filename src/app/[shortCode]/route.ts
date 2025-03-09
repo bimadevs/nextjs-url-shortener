@@ -6,10 +6,10 @@ export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function GET(
-  request: NextRequest, context: any
+  request: NextRequest,
+  context: { params: { shortCode: string } }
 ) {
   try {
-    const shortCode = context.params.shortCode;
     const cookieStore = cookies();
     const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
 
@@ -17,7 +17,7 @@ export async function GET(
     const { data: urlData, error: fetchError } = await supabase
       .from('short_urls')
       .select('id, original_url, clicks')
-      .eq('short_code', shortCode)
+      .eq('short_code', context.params.shortCode)
       .single();
 
     if (fetchError || !urlData) {
@@ -30,18 +30,26 @@ export async function GET(
       });
     }
 
-    // Update jumlah klik
+    // Update jumlah klik menggunakan RPC untuk atomic increment
     const { error: updateError } = await supabase
-      .from('short_urls')
-      .update({ clicks: (urlData.clicks || 0) + 1 })
-      .eq('id', urlData.id);
+      .rpc('increment_clicks', {
+        url_id: urlData.id
+      });
 
     if (updateError) {
       console.error('Error updating clicks:', updateError);
     }
 
-    // Redirect ke URL asli
-    return NextResponse.redirect(urlData.original_url, { status: 302 });
+    // Redirect ke URL asli dengan cache control untuk mencegah caching
+    return new NextResponse(null, {
+      status: 302,
+      headers: {
+        'Location': urlData.original_url,
+        'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0',
+      },
+    });
   } catch (error) {
     console.error('Error in redirect handler:', error);
     return new NextResponse('Terjadi kesalahan', { 
