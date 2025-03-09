@@ -13,7 +13,7 @@ Aplikasi pemendek URL modern yang dibangun dengan Next.js 14, Supabase, dan Tail
   
 - 🎯 **Manajemen URL**
   - Pembuatan URL pendek otomatis
-  - Opsi custom alias
+  - Opsi kode kustom
   - Pelacakan jumlah klik
   - Pengelolaan URL (hapus, salin)
   - Kadaluarsa otomatis setelah 1 bulan
@@ -52,6 +52,10 @@ cd next-url-shortener
 2. Install dependencies
 ```bash
 npm install
+# atau
+yarn install
+# atau
+pnpm install
 ```
 
 3. Setup environment variables
@@ -112,6 +116,10 @@ $$;
 5. Jalankan development server
 ```bash
 npm run dev
+# atau
+yarn dev
+# atau
+pnpm dev
 ```
 
 Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
@@ -126,7 +134,7 @@ Buka [http://localhost:3000](http://localhost:3000) di browser Anda.
 2. **Membuat URL Pendek**
    - Masukkan URL asli
    - (Opsional) Tambahkan judul
-   - (Opsional) Gunakan cutome alias
+   - (Opsional) Gunakan kode kustom
    - Klik "Persingkat URL"
 
 3. **Mengelola URL**
