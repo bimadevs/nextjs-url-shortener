@@ -105,7 +105,7 @@ export default function AuthForm() {
           onSelectionChange={(key) => setSelectedTab(key.toString())}
           classNames={{
             tabList: "gap-4 w-full relative rounded-full p-1 border border-white/10 bg-white/5",
-            cursor: "bg-white/10 backdrop-blur-xl",
+            cursor: "bg-white/10 rounded-full backdrop-blur-xl",
             tab: "data-[selected=true]:text-white text-gray-400/80 h-10",
             tabContent: "group-data-[selected=true]:text-white"
           }}
